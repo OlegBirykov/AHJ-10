@@ -1,2 +1,4 @@
-// eslint-disable-next-line no-console
-console.log('it works!');
+import TimelineWidget from './TimelineWidget';
+
+const timelineWidget = new TimelineWidget(document.getElementById('container'), document.body);
+timelineWidget.bindToDOM();

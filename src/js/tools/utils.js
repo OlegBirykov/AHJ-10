@@ -9,3 +9,7 @@ export function coordsToString(coords) {
 export function dateTimeToString(timestamp) {
   return moment(timestamp).format('DD.MM.YY HH:mm');
 }
+
+export function timer(timestamp) {
+  return moment(moment().diff(timestamp)).format('mm:ss');
+}

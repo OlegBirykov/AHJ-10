@@ -151,18 +151,19 @@ button:hover {
 }
 
 .popup {
-  position: absolute;
+  position: fixed;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
   display: flex;
+  justify-content: center;
+  align-items: center;
   background-color: rgba(255, 255, 255, 0.8);
 }
 
 .geolocation-form {
   width: 400px;
-  margin: auto;
   padding: 0 1.2em;
   background-color: white;
   border: 1px solid black;
@@ -206,7 +207,6 @@ button:hover {
 
 .audio-video-form {
   width: 400px;
-  margin: auto;
   padding: 0 1.2em;
   background-color: white;
   border: 1px solid black;

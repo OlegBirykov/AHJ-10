@@ -1,6 +1,7 @@
 import PostWidget, { textType, audioType, videoType } from './widgets/PostWidget';
 import GeolocationErrorPopup from './popups/GeolocationErrorPopup';
 import AudioVideoErrorPopup from './popups/AudioVideoErrorPopup';
+import { timer } from './tools/utils';
 
 export default class TimelineWidget {
   constructor(parentEl, parentPopupEl) {
@@ -44,7 +45,6 @@ export default class TimelineWidget {
             &#x2714;
           </button>
           <p class="timer">
-            00:00
           </p>
           <button class="${this.classes.buttonCancel}" type="button">
             &#x2613;
@@ -71,6 +71,8 @@ export default class TimelineWidget {
     this.buttonOk = this.form.querySelector(`.${this.classes.buttonOk}`);
     this.buttonCancel = this.form.querySelector(`.${this.classes.buttonCancel}`);
 
+    this.timer = this.form.querySelector(`.${this.classes.timer}`);
+
     this.form.addEventListener('submit', (evt) => {
       evt.preventDefault();
 
@@ -85,8 +87,10 @@ export default class TimelineWidget {
       this.getPosition();
     });
 
-    this.buttonAudio.addEventListener('click', () => this.recordAudio());
-    this.buttonVideo.addEventListener('click', () => this.recordVideo());
+    this.buttonAudio.addEventListener('click', () => this.startRecord(audioType));
+    this.buttonVideo.addEventListener('click', () => this.startRecord(videoType));
+    this.buttonOk.addEventListener('click', () => this.saveRecord());
+    this.buttonCancel.addEventListener('click', () => this.cancelRecord());
 
     this.parentEl.append(this.widget);
 
@@ -117,15 +121,79 @@ export default class TimelineWidget {
     this.posts.scrollTop = 0;
   }
 
-  recordAudio() {
+  async startRecord(mode) {
     this.text.value = '';
-    this.audioVideoPopup.show();
-    this.newPostType = audioType;
+    this.newPostType = mode;
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: mode === videoType,
+      });
+      this.recorder = new MediaRecorder(stream);
+      const chunks = [];
+
+      this.recorder.addEventListener('start', () => {
+        this.showRecorder();
+        const begin = Date.now();
+        this.timerId = setInterval(
+          () => {
+            const time = timer(begin);
+            if (this.timer.innerText !== time) {
+              this.timer.innerText = time;
+            }
+
+            if (this.timer.innerText === (mode === videoType ? '00:10' : '02:00')) {
+              this.saveRecord();
+            }
+          },
+          100,
+        );
+      });
+
+      this.recorder.addEventListener('dataavailable', (evt) => {
+        chunks.push(evt.data);
+      });
+
+      this.recorder.addEventListener('stop', (evt) => {
+        chunks.push(evt.data);
+        clearInterval(this.timerId);
+        stream.getTracks().forEach((track) => track.stop());
+        delete this.recorder;
+
+        if (!this.save) {
+          return;
+        }
+        this.newPostContent = new Blob(chunks);
+        this.getPosition();
+      });
+
+      this.recorder.start();
+    } catch (e) {
+      this.audioVideoPopup.show(mode === videoType);
+    }
   }
 
-  recordVideo() {
-    this.text.value = '';
-    this.audioVideoPopup.show('videoMode');
-    this.newPostType = videoType;
+  saveRecord() {
+    this.hideRecorder();
+    this.save = true;
+    this.recorder.stop();
+  }
+
+  cancelRecord() {
+    this.hideRecorder();
+    this.save = false;
+    this.recorder.stop();
+  }
+
+  showRecorder() {
+    this.textButtons.classList.add('hidden');
+    this.timer.innerText = '00:00';
+    this.recordButtons.classList.remove('hidden');
+  }
+
+  hideRecorder() {
+    this.recordButtons.classList.add('hidden');
+    this.textButtons.classList.remove('hidden');
   }
 }

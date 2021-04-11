@@ -48,7 +48,6 @@ export default class AudioVideoErrorPopup {
   }
 
   show(videoMode) {
-    console.log(this.parentEl);
     const text = `К сожалению, нам не удалось выполнить ${videoMode ? 'видео' : 'аудио'}запись, `
       + `пожалуйста, дайте разрешение на использование ${videoMode ? 'камеры и микрофона' : 'микрофона'} `
       + 'или откройте страницу в другом браузере.';

@@ -14,6 +14,7 @@ export default class TimelineWidget {
     return {
       widget: 'time-line-widget',
       posts: 'posts',
+      video: 'video',
       form: 'form',
       input: 'text',
       textButtons: 'text-buttons',
@@ -30,6 +31,7 @@ export default class TimelineWidget {
     return `
       <div class="${this.classes.posts}">
       </div>
+      <video class="${this.classes.video} hidden" muted></video>
       <form class="${this.classes.form}">
         <input class="${this.classes.input}" name="${this.classes.input}" placeholder="Введите текст и нажмите Enter">
         <div class="${this.classes.textButtons}">
@@ -60,6 +62,7 @@ export default class TimelineWidget {
     this.widget.innerHTML = this.constructor.markup;
 
     this.posts = this.widget.querySelector(`.${this.classes.posts}`);
+    this.video = this.widget.querySelector(`.${this.classes.video}`);
     this.form = this.widget.querySelector(`.${this.classes.form}`);
 
     this.text = this.form.querySelector(`.${this.classes.input}`);
@@ -130,7 +133,13 @@ export default class TimelineWidget {
         audio: true,
         video: mode === videoType,
       });
+
       this.recorder = new MediaRecorder(stream);
+      if (mode === videoType) {
+        this.video.classList.remove('hidden');
+        this.video.srcObject = stream;
+        this.video.play();
+      }
       const chunks = [];
 
       this.recorder.addEventListener('start', () => {
@@ -155,10 +164,11 @@ export default class TimelineWidget {
         chunks.push(evt.data);
       });
 
-      this.recorder.addEventListener('stop', (evt) => {
-        chunks.push(evt.data);
+      this.recorder.addEventListener('stop', () => {
         clearInterval(this.timerId);
         stream.getTracks().forEach((track) => track.stop());
+        this.video.srcObject = null;
+        this.video.classList.add('hidden');
         delete this.recorder;
 
         if (!this.save) {

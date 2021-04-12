@@ -20,7 +20,9 @@ export default class PostWidget {
     return {
       widget: 'post-widget',
       leftPanel: 'left-panel',
+      position: 'position',
       coords: 'coords',
+      eye: 'eye',
       rightPanel: 'right-panel',
       datetime: 'datetime',
     };
@@ -29,8 +31,10 @@ export default class PostWidget {
   static get markup() {
     return `
       <div class="${this.classes.leftPanel}">
-        <p class="${this.classes.coords}">
-        </p>    
+        <div class="${this.classes.position}">
+          <p class="${this.classes.coords}"></p>
+          <img class="${this.classes.eye}" src="img/eye.png" alt="eye">
+        </div>    
       </div>
       <div class="${this.classes.rightPanel}">
         <p class="${this.classes.datetime}">

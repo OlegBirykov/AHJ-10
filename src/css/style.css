@@ -177,6 +177,32 @@ button:hover {
   width: 100%;
 }
 
+.video-widget .video-frame {
+  position: relative;
+}
+
+.video-widget .button-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2em;
+  width: 2em;
+  height: 2em;
+  border: 1px solid black;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.video-widget .button-play:hover {
+  background-color: yellow;
+}
+
+.video-widget .progress {
+  display: block;
+  width: 100%; 
+}
+
 .popup {
   position: fixed;
   top: 0;
